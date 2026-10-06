@@ -43,7 +43,7 @@ html_code = """
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -103,7 +103,7 @@ html_code = """
                         <p class="text-xs text-slate-200">เครื่องมือวิเคราะห์ความเสี่ยงและสนับสนุนการตรวจสอบระบบผลิตน้ำประปา</p>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <button id="btn-load-sample" onclick="loadSampleData()" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold text-xs md:text-sm shadow-md transition transform active:scale-95">
                         <i data-lucide="database" class="w-4 h-4"></i>
@@ -147,7 +147,7 @@ html_code = """
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full" id="printable-area">
-        
+
         <!-- TAB: DASHBOARD -->
         <section id="tab-dashboard" class="tab-content space-y-6">
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -233,15 +233,23 @@ html_code = """
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="font-heading font-semibold text-slate-800">สถานะข้อเสนอแนะ 7 ข้อ</h3>
-                            <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Action Plan</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="resetActionItems()" title="คืนค่าสถานะเริ่มต้นตามรายงาน" class="no-print p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Action Plan</span>
+                            </div>
                         </div>
-                        <p class="text-xs text-slate-500 mb-4">ติดตามผลความคืบหน้าของหน่วยรับตรวจ</p>
+                        <p class="text-xs text-slate-500 mb-4">ติดตามผลความคืบหน้าของหน่วยรับตรวจ <span class="no-print">• เปลี่ยนสถานะได้จากป้ายด้านขวา คลิกชื่อข้อเพื่อบันทึกหมายเหตุ</span></p>
                         <div class="space-y-2.5" id="action-items-container"></div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                        <span>แล้วเสร็จ: <b id="stat-completed" class="text-emerald-600 font-semibold">2</b> ข้อ</span>
-                        <span>บางส่วน: <b id="stat-partial" class="text-amber-600 font-semibold">2</b> ข้อ</span>
-                        <span>รอดำเนินการ: <b id="stat-pending" class="text-slate-600 font-semibold">3</b> ข้อ</span>
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span>แล้วเสร็จ: <b id="stat-completed" class="text-emerald-600 font-semibold">2</b> ข้อ</span>
+                            <span>บางส่วน: <b id="stat-partial" class="text-amber-600 font-semibold">2</b> ข้อ</span>
+                            <span>รอดำเนินการ: <b id="stat-pending" class="text-slate-600 font-semibold">3</b> ข้อ</span>
+                        </div>
+                        <p id="action-save-status" class="no-print text-[10px] text-right mt-1 h-3"></p>
                     </div>
                 </div>
             </div>
@@ -583,7 +591,7 @@ html_code = """
                         <tbody class="divide-y divide-slate-100" id="pipeline-tbody"></tbody>
                     </table>
                 </div>
-                
+
                 <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
                     <i data-lucide="shield-check" class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"></i>
                     <div>
@@ -685,15 +693,161 @@ html_code = """
             { id: 5, station: 'กม. 24+950 (ปลายท่อ ม.5)', location: 'จุดล้างท่อ Blow-off', planPipe: 'HDPE 110 มม.', actualPipe: 'HDPE 110 มม.', pn: 'PN 6', valve: 'Blow-off Valve', match: true }
         ];
 
-        const actionItems = [
-            { no: 1, title: 'สำรวจครัวเรือนผู้ใช้น้ำ & จัดหาแหล่งน้ำดิบสำรอง', status: 'pending', label: 'อยู่ระหว่างดำเนินการ' },
-            { no: 2, title: 'ปรับปรุงคุณภาพน้ำประปา (คลอรีน & แมงกานีส)', status: 'completed', label: 'ดำเนินการแล้วเสร็จ' },
-            { no: 3, title: 'เปิดใช้ Line Notify, VSD & ติดตั้งหม้อแปลง ม.2', status: 'completed', label: 'ดำเนินการแล้วเสร็จ' },
-            { no: 4, title: 'จัดทำบัญชีต้นทุนการผลิตน้ำประปาต่อหน่วย', status: 'pending', label: 'อยู่ระหว่างดำเนินการ' },
-            { no: 5, title: 'ลงทะเบียนคุมพัสดุ พ.ด.1 & ทะเบียนสารเคมี', status: 'partial', label: 'แล้วเสร็จบางส่วน (กองคลัง)' },
-            { no: 6, title: 'แก้ไขอุปกรณ์ไม่ตรงแบบ (วัดความขุ่น/ฝา PRV)', status: 'partial', label: 'แล้วเสร็จบางส่วน' },
-            { no: 7, title: 'กำชับระเบียบพิจารณาขยายระยะเวลาสัญญา', status: 'pending', label: 'อยู่ระหว่างดำเนินการ' }
+        // ---------- สถานะข้อเสนอแนะ (Action Plan) ----------
+        // ค่าเริ่มต้นตามรายงานผลการตรวจสอบ อบต.ไชยราช
+        // สถานะที่ผู้ใช้แก้ไขจะถูกบันทึกไว้ใน localStorage ของเบราว์เซอร์ และโหลดกลับมาเมื่อเปิดหน้าใหม่
+        const ACTION_STORAGE_KEY = 'wsat-chaiyarat-action-items-v1';
+
+        const STATUS_OPTIONS = {
+            pending:   { label: 'อยู่ระหว่างดำเนินการ', cls: 'bg-slate-100 text-slate-600 border-slate-200' },
+            partial:   { label: 'แล้วเสร็จบางส่วน', cls: 'bg-amber-100 text-amber-800 border-amber-200 font-semibold' },
+            completed: { label: 'ดำเนินการแล้วเสร็จ', cls: 'bg-emerald-100 text-emerald-800 border-emerald-200 font-semibold' }
+        };
+
+        const defaultActionItems = [
+            { no: 1, title: 'สำรวจครัวเรือนผู้ใช้น้ำ & จัดหาแหล่งน้ำดิบสำรอง', status: 'pending', note: '' },
+            { no: 2, title: 'ปรับปรุงคุณภาพน้ำประปา (คลอรีน & แมงกานีส)', status: 'completed', note: '' },
+            { no: 3, title: 'เปิดใช้ Line Notify, VSD & ติดตั้งหม้อแปลง ม.2', status: 'completed', note: '' },
+            { no: 4, title: 'จัดทำบัญชีต้นทุนการผลิตน้ำประปาต่อหน่วย', status: 'pending', note: '' },
+            { no: 5, title: 'ลงทะเบียนคุมพัสดุ พ.ด.1 & ทะเบียนสารเคมี', status: 'partial', note: 'กองคลังดำเนินการแล้วบางส่วน' },
+            { no: 6, title: 'แก้ไขอุปกรณ์ไม่ตรงแบบ (วัดความขุ่น/ฝา PRV)', status: 'partial', note: '' },
+            { no: 7, title: 'กำชับระเบียบพิจารณาขยายระยะเวลาสัญญา', status: 'pending', note: '' }
         ];
+
+        let actionItems = loadActionItems();
+        let expandedActionNo = null;
+        let saveStatusTimer = null;
+
+        function cloneDefaultActionItems() {
+            return defaultActionItems.map(item => ({ ...item, updated: '' }));
+        }
+
+        function loadActionItems() {
+            try {
+                const raw = localStorage.getItem(ACTION_STORAGE_KEY);
+                const saved = raw ? JSON.parse(raw) : null;
+                if (Array.isArray(saved)) {
+                    return cloneDefaultActionItems().map(item => {
+                        const s = saved.find(x => x.no === item.no);
+                        if (!s) return item;
+                        return {
+                            ...item,
+                            status: STATUS_OPTIONS[s.status] ? s.status : item.status,
+                            note: typeof s.note === 'string' ? s.note : item.note,
+                            updated: typeof s.updated === 'string' ? s.updated : ''
+                        };
+                    });
+                }
+            } catch (err) {
+                // ข้อมูลที่บันทึกไว้เสียหายหรือเบราว์เซอร์ไม่อนุญาต ใช้ค่าเริ่มต้นแทน
+            }
+            return cloneDefaultActionItems();
+        }
+
+        function saveActionItems() {
+            try {
+                const data = actionItems.map(({ no, status, note, updated }) => ({ no, status, note, updated }));
+                localStorage.setItem(ACTION_STORAGE_KEY, JSON.stringify(data));
+                showSaveStatus('บันทึกแล้ว', false);
+            } catch (err) {
+                showSaveStatus('บันทึกในเบราว์เซอร์ไม่ได้ ข้อมูลจะหายเมื่อรีเฟรชหน้า', true);
+            }
+        }
+
+        function showSaveStatus(message, isError) {
+            const el = document.getElementById('action-save-status');
+            el.innerText = message;
+            el.className = `no-print text-[10px] text-right mt-1 h-3 ${isError ? 'text-red-600' : 'text-emerald-600'}`;
+            clearTimeout(saveStatusTimer);
+            saveStatusTimer = setTimeout(() => { el.innerText = ''; }, 2500);
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function nowThai() {
+            return new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        function renderActionTracker() {
+            const container = document.getElementById('action-items-container');
+            container.innerHTML = '';
+            const counts = { completed: 0, partial: 0, pending: 0 };
+
+            actionItems.forEach((item, index) => {
+                counts[item.status]++;
+                const opt = STATUS_OPTIONS[item.status];
+                const isOpen = expandedActionNo === item.no;
+                const optionsHtml = Object.entries(STATUS_OPTIONS)
+                    .map(([key, o]) => `<option value="${key}" ${key === item.status ? 'selected' : ''}>${o.label}</option>`)
+                    .join('');
+
+                const div = document.createElement('div');
+                div.className = `text-xs rounded-lg border ${isOpen ? 'bg-white border-audit-100 shadow-sm' : 'bg-slate-50 border-slate-100'}`;
+                div.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 p-2">
+                        <button type="button" onclick="toggleActionDetail(${item.no})" title="${escapeHtml(item.title)}" class="flex items-center space-x-2 min-w-0 flex-1 text-left">
+                            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0">${item.no}</span>
+                            <span class="truncate text-slate-700 font-medium">${escapeHtml(item.title)}</span>
+                            ${item.note ? '<i data-lucide="message-square-text" class="w-3 h-3 text-slate-400 flex-shrink-0"></i>' : ''}
+                        </button>
+                        <select onchange="updateActionStatus(${index}, this.value)" title="เปลี่ยนสถานะ" class="px-1.5 py-0.5 rounded border text-[10px] cursor-pointer outline-none focus:ring-2 focus:ring-blue-400 flex-shrink-0 ${opt.cls}">
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                    ${isOpen ? `
+                    <div class="px-2 pb-2 pt-2 border-t border-slate-100 space-y-1.5">
+                        <p class="text-slate-700 leading-snug">${escapeHtml(item.title)}</p>
+                        <label class="text-[10px] text-slate-500 block">หมายเหตุ / หลักฐานการติดตามผล</label>
+                        <textarea rows="2" onchange="updateActionNote(${index}, this.value)" placeholder="เช่น เลขที่หนังสือแจ้งผล วันที่ลงพื้นที่ติดตาม" class="w-full text-xs px-2 py-1 bg-white border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">${escapeHtml(item.note)}</textarea>
+                        <p class="text-[10px] text-slate-400">ปรับปรุงล่าสุด: <span id="action-updated-${item.no}">${item.updated ? escapeHtml(item.updated) : '-'}</span></p>
+                    </div>` : ''}
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('stat-completed').innerText = counts.completed;
+            document.getElementById('stat-partial').innerText = counts.partial;
+            document.getElementById('stat-pending').innerText = counts.pending;
+            lucide.createIcons();
+        }
+
+        function toggleActionDetail(no) {
+            expandedActionNo = expandedActionNo === no ? null : no;
+            renderActionTracker();
+        }
+
+        function updateActionStatus(index, status) {
+            if (!STATUS_OPTIONS[status]) return;
+            actionItems[index].status = status;
+            actionItems[index].updated = nowThai();
+            saveActionItems();
+            renderActionTracker();
+        }
+
+        function updateActionNote(index, note) {
+            // ไม่ render ใหม่ทั้งรายการ เพื่อไม่ให้คลิกถัดไปของผู้ใช้หลุด
+            const item = actionItems[index];
+            item.note = note.trim();
+            item.updated = nowThai();
+            saveActionItems();
+            const updatedEl = document.getElementById(`action-updated-${item.no}`);
+            if (updatedEl) updatedEl.innerText = item.updated;
+        }
+
+        function resetActionItems() {
+            if (!confirm('คืนค่าสถานะข้อเสนอแนะทั้ง 7 ข้อเป็นค่าเริ่มต้นตามรายงาน?\\nสถานะและหมายเหตุที่แก้ไขไว้จะถูกลบ')) return;
+            actionItems = cloneDefaultActionItems();
+            expandedActionNo = null;
+            try {
+                localStorage.removeItem(ACTION_STORAGE_KEY);
+            } catch (err) {
+                // ไม่มีสิทธิ์เข้าถึง localStorage ก็แค่ไม่ต้องลบ
+            }
+            renderActionTracker();
+            showSaveStatus('คืนค่าเริ่มต้นแล้ว', false);
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -766,40 +920,6 @@ html_code = """
                     }
                 }
             });
-        }
-
-        function renderActionTracker() {
-            const container = document.getElementById('action-items-container');
-            container.innerHTML = '';
-            let completed = 0, partial = 0, pending = 0;
-
-            actionItems.forEach(item => {
-                let badgeClass = 'bg-slate-100 text-slate-600';
-                if (item.status === 'completed') {
-                    badgeClass = 'bg-emerald-100 text-emerald-800 font-semibold';
-                    completed++;
-                } else if (item.status === 'partial') {
-                    badgeClass = 'bg-amber-100 text-amber-800 font-semibold';
-                    partial++;
-                } else {
-                    pending++;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between text-xs p-2 rounded-lg bg-slate-50 border border-slate-100';
-                div.innerHTML = `
-                    <div class="flex items-center space-x-2 truncate mr-2">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0">${item.no}</span>
-                        <span class="truncate text-slate-700 font-medium">${item.title}</span>
-                    </div>
-                    <span class="px-2 py-0.5 rounded text-[10px] whitespace-nowrap ${badgeClass}">${item.label}</span>
-                `;
-                container.appendChild(div);
-            });
-
-            document.getElementById('stat-completed').innerText = completed;
-            document.getElementById('stat-partial').innerText = partial;
-            document.getElementById('stat-pending').innerText = pending;
         }
 
         function calculateWaterBalance() {
@@ -961,7 +1081,7 @@ html_code = """
             initialRiskDimensions.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
-                
+
                 let badgeClass = 'bg-emerald-100 text-emerald-800';
                 let statusText = 'ต่ำ';
                 if (item.score >= 16) {
